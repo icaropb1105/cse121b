@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Viewer</title>
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h2 {
+            margin-top: 10;
+            background-color: aqua;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
+
+
+</head>
+<body>
+    <form id="searchForm">
+        <label for="recipeName">Enter Recipe Name:</label>
+        <input type="text" id="recipeName" name="recipeName">
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="recipeContainer"></div>
+
+    <h2>Some Recipe Options</h2>
+    <ul id="recipeList"></ul>
+
+
+
+
+    <script>
+//jsssss
+        const form = document.getElementById('searchForm');
+        const recipeNameInput = document.getElementById('recipeName');
+        const recipeContainer = document.getElementById('recipeContainer');
+        const recipeList = document.getElementById('recipeList');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const recipeName = recipeNameInput.value.trim();
+            if (!recipeName) {
+                alert('Please enter a recipe name.');
+                return;
+            }
+
+            const apiUrl = `https://www.themealdb.com/api/json/v1/1/search.php?s=${recipeName}`;
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const meal = data.meals ? data.meals[0] : null;
+                if (meal) {
+                    displayRecipe(meal);
+                } else {
+                    recipeContainer.innerHTML = '<p>No recipe found.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching recipe:', error);
+                alert('Error fetching recipe. Please try again later.');
+            }
+        });
+
+        function displayRecipe(recipe) {
+            recipeContainer.innerHTML = `
+                <h2>${recipe.strMeal}</h2>
+                <img src="${recipe.strMealThumb}" alt="${recipe.strMeal}">
+                <p><strong>Category:</strong> ${recipe.strCategory}</p>
+                <p><strong>Area:</strong> ${recipe.strArea}</p>
+                <p><strong>Instructions:</strong> ${recipe.strInstructions}</p>
+                <h3>Ingredients</h3>
+                <ul>
+                    ${renderIngredients(recipe)}
+                </ul>
+                <a href="${recipe.strYoutube}" target="_blank">Watch on YouTube</a>
+            `;
+        }
+
+        function renderIngredients(recipe) {
+            let ingredientsList = '';
+            for (let i = 1; i <= 20; i++) {
+                const ingredient = recipe[`strIngredient${i}`];
+                const measure = recipe[`strMeasure${i}`];
+                if (ingredient && measure) {
+                    ingredientsList += `<li>${measure} ${ingredient}</li>`;
+                }
+            }
+            return ingredientsList;
+        }
+
+        const recipes = [
+        "Corba",
+    "Sushi",
+    "Burek",
+    "Bistek",
+    "Tamiya",
+    "Kumpir",
+    "Wontons",
+    "Lasagne",
+    "Kafteji",
+    "Big Mac",
+    "Poutine",
+    "Koshari",
+    "Moussaka",
+    "Shakshuka",
+    "Sugar Pie",
+    "Ribollita",
+    "Pancakes",
+    "Kapsalon",
+    "Fish pie",
+    "Flamiche",
+    "Shawarma",
+    "Kedgeree",
+    "Stamppot",
+    "Moussaka"
+];
+        recipes.forEach(recipe => {
+            const listItem = document.createElement('li');
+            listItem.textContent = recipe;
+            recipeList.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>
